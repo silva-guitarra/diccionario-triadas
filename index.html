@@ -17,7 +17,7 @@
             font-family: 'Inter', sans-serif; background-color: var(--bg-dark); 
             background-image: radial-gradient(circle at 50% 0%, #1e1e24 0%, transparent 70%);
             color: var(--text-main); text-align: center; margin: 0; padding: 20px 10px; min-height: 100vh;
-            box-sizing: border-box;
+            box-sizing: border-box; overflow-x: hidden; /* Evita cualquier scroll fantasma lateral */
         }
 
         /* --- BARRA SOCIAL HEADER --- */
@@ -95,7 +95,6 @@
         .bio-content strong { color: var(--accent); }
         .bio-content em { color: #f1f5f9; }
         
-        /* Grid para Spotify Embeds */
         .discografia-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -117,16 +116,19 @@
             border-left: 3px solid var(--accent);
         }
 
+        /* --- CONTENEDOR ESCALABLE DEL MÁSTIL --- */
         .contenedor-mastil {
-            width: 100%; overflow-x: auto; margin: 0 auto 30px auto;
-            padding-bottom: 15px; -webkit-overflow-scrolling: touch;
+            width: 100%; max-width: 800px; margin: 0 auto 30px auto;
+            position: relative; height: 215px; /* Controlado por JS para adaptar altura */
         }
 
         .mastil {
             background: var(--fretboard); width: 800px; height: 180px; 
-            position: relative; border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 20px rgba(0,0,0,0.8);
-            margin: 0 auto; user-select: none;
+            position: absolute; top: 0; left: 0;
+            border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 20px rgba(0,0,0,0.8);
+            transform-origin: top left; user-select: none;
         }
+        
         .trastes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; pointer-events: none; }
         .traste { flex: 1; border-right: 2px solid rgba(255,255,255,0.1); position: relative;}
         .traste:first-child { border-left: 8px solid #cbd5e1; box-shadow: 2px 0 5px rgba(0,0,0,0.5);}
@@ -303,7 +305,6 @@
                 
                 <h3 style="margin-top: 30px; margin-bottom: 20px; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px;">Discografía Destacada</h3>
                 
-                <!-- Cuadrícula de Spotify -->
                 <div class="discografia-grid">
                     <!-- Neno y los suyos -->
                     <div class="disco-card">
@@ -461,7 +462,6 @@
         function cambiarModo(modo) {
             modoActual = modo;
             
-            // Gestionar estado visual de los botones
             document.getElementById('tab-dic').classList.toggle('activo', modo === 'diccionario');
             document.getElementById('tab-detector').classList.toggle('activo', modo === 'detector');
             document.getElementById('tab-prog').classList.toggle('activo', modo === 'progresion');
@@ -469,7 +469,6 @@
             
             let esAppTool = (modo === 'diccionario' || modo === 'detector' || modo === 'progresion');
 
-            // Mostrar u Ocultar el contenedor principal de la App vs la Biografía
             document.getElementById('contenedor-app').style.display = esAppTool ? 'block' : 'none';
             document.getElementById('panel-bio').style.display = modo === 'bio' ? 'block' : 'none';
 
@@ -863,6 +862,25 @@
                 window.print();
             }, 350); 
         }
+
+        // AJUSTE RESPONSIVE (Evitar scroll horizontal en móviles)
+        function ajustarEscalaMastil() {
+            const wrapper = document.getElementById('contenedor-mastil-wrapper');
+            const mastil = document.getElementById('mastil');
+            if (!wrapper || !mastil) return;
+            
+            const ancho = wrapper.clientWidth;
+            // Solo escala si la pantalla es más pequeña que 800px
+            const escala = ancho < 800 ? ancho / 800 : 1;
+            
+            mastil.style.transform = `scale(${escala})`;
+            // Ajustamos la altura del contenedor para no dejar huecos (180 * escala + margen para la sombra)
+            wrapper.style.height = (180 * escala + (escala < 1 ? 10 : 35)) + 'px';
+        }
+        
+        window.addEventListener('resize', ajustarEscalaMastil);
+        // Llamada inicial para ajustar el tamaño al cargar la página
+        setTimeout(ajustarEscalaMastil, 50);
     </script>
 </body>
 </html>
