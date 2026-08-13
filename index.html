@@ -20,8 +20,25 @@
             box-sizing: border-box;
         }
 
+        /* --- BARRA SOCIAL HEADER --- */
+        .top-social-bar {
+            display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;
+        }
+        .social-icon {
+            display: flex; align-items: center; gap: 8px; color: var(--text-muted); text-decoration: none;
+            font-size: 14px; font-weight: 600; padding: 8px 16px; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--panel-border); border-radius: 20px; transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            color: #E1306C; border-color: #E1306C; transform: translateY(-2px); background: rgba(225, 48, 108, 0.1);
+        }
+        .social-icon.store:hover {
+            color: var(--accent); border-color: var(--accent); background: rgba(0, 242, 254, 0.1);
+        }
+        .social-icon svg { width: 18px; height: 18px; }
+
         h1 {
-            font-weight: 800; font-size: 2.2rem; margin-bottom: 25px;
+            font-weight: 800; font-size: 2.2rem; margin-top: 10px; margin-bottom: 25px;
             background: linear-gradient(to right, #00f2fe, #4facfe);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px;
         }
@@ -61,12 +78,44 @@
         select:hover { background-color: rgba(255,255,255,0.1); }
         select option { background-color: var(--bg-dark); }
         
-        .btn-accion { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: #000; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3); }
+        .btn-accion { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: #000; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3); text-decoration: none; }
         .btn-accion:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5); }
         .btn-clear { background: rgba(255, 63, 52, 0.1); color: #ff3f34; border: 1px solid rgba(255, 63, 52, 0.3); cursor: pointer; }
         .btn-clear:hover { background: rgba(255, 63, 52, 0.2); transform: translateY(-2px); }
         .btn-pdf { background: rgba(46, 213, 115, 0.1); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); cursor: pointer; }
         .btn-pdf:hover { background: rgba(46, 213, 115, 0.2); transform: translateY(-2px); }
+
+        /* --- SECCIÓN BIOGRAFÍA Y DISCOGRAFÍA --- */
+        #panel-bio {
+            max-width: 800px; margin: 0 auto; text-align: left; display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .bio-content { line-height: 1.8; color: var(--text-main); font-size: 1.05rem; }
+        .bio-content strong { color: var(--accent); }
+        .bio-content em { color: #f1f5f9; }
+        
+        /* Grid para Spotify Embeds */
+        .discografia-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .disco-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 14px;
+            padding: 15px;
+            border: 1px solid var(--panel-border);
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .disco-info {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            padding-left: 5px;
+            border-left: 3px solid var(--accent);
+        }
 
         .contenedor-mastil {
             width: 100%; overflow-x: auto; margin: 0 auto 30px auto;
@@ -117,15 +166,16 @@
             background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2);
             border-radius: 12px; padding: 20px; margin-top: 10px; text-align: center;
         }
-        .nombre-acorde-detectado { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin-bottom: 8px; letter-spacing: -1px; }
+        .nombre-acorde-detectado { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin-bottom: 8px; letter-spacing: -1px; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;}
         .detalles-acorde { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
-        .badge-inversion { display: inline-block; background: rgba(255, 63, 52, 0.2); color: #ff4757; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 10px; vertical-align: middle; }
+        .badge-inversion { display: inline-block; background: rgba(255, 63, 52, 0.15); color: #ff4757; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; margin-left: 8px; vertical-align: middle; border: 1px solid rgba(255, 63, 52, 0.3);}
+        .opcion-secundaria { color: var(--text-muted); font-size: 1.6rem; font-weight: 600; }
 
         #contenedor-exportacion-pdf { display: none; }
 
         @media print {
             body { background: #ffffff !important; color: #000000 !important; padding: 10px; margin: 0; }
-            h1, .tabs, .controles, .contenedor-mastil, .leyenda, #panel-resultados-diccionario, #panel-detector-info { display: none !important; }
+            .top-social-bar, h1, .tabs, .controles, .contenedor-mastil, .leyenda, #panel-resultados-diccionario, #panel-detector-info, #panel-bio { display: none !important; }
             #contenedor-exportacion-pdf { display: block !important; width: 100%; text-align: center; font-family: 'Inter', sans-serif; }
             .pdf-titulo { color: #000000; font-size: 24px; font-weight: 800; border-bottom: 2px solid #222; padding-bottom: 8px; margin-bottom: 25px; text-align: left; }
             .pdf-imagen-mastil { width: 100%; height: auto; border: 1px solid #444; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 25px; display: block; }
@@ -139,88 +189,151 @@
 </head>
 <body>
 
+    <div class="top-social-bar">
+        <a href="https://www.instagram.com/c.silva87/" target="_blank" class="social-icon" title="Instagram Carlos Silva">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            Carlos Silva
+        </a>
+        <a href="https://www.instagram.com/nenoylossuyos/" target="_blank" class="social-icon" title="Instagram Neno y los suyos">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            Neno y los suyos
+        </a>
+        <a href="https://www.lacasadeldisco.es/neno-y-los-suyos-cd-no-me-toques-los-versos.html" target="_blank" class="social-icon store" title="Comprar Disco">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+            Comprar CD
+        </a>
+    </div>
+
     <h1>La fantástica APP del profesor Silva</h1>
     
     <div class="tabs">
         <button id="tab-dic" class="tab-btn activo" onclick="cambiarModo('diccionario')">Buscador Posiciones</button>
         <button id="tab-detector" class="tab-btn" onclick="cambiarModo('detector')">🎨 Detector Inverso</button>
         <button id="tab-prog" class="tab-btn" onclick="cambiarModo('progresion')">Progresiones</button>
+        <button id="tab-bio" class="tab-btn" onclick="cambiarModo('bio')">👤 Sobre mí</button>
     </div>
     
-    <div class="controles">
-        <div id="panel-selectores" style="margin-bottom: 15px;">
-            <select id="notaSelect">
-                <option value="0">Do (C)</option><option value="1">Do# (C#)</option><option value="2">Re (D)</option>
-                <option value="3">Re# (D#)</option><option value="4">Mi (E)</option><option value="5">Fa (F)</option>
-                <option value="6">Fa# (F#)</option><option value="7">Sol (G)</option><option value="8">Sol# (G#)</option>
-                <option value="9">La (A)</option><option value="10">La# (A#)</option><option value="11">Si (B)</option>
-            </select>
-            <select id="tipoSelect">
-                <optgroup label="Tríadas (3 Notas)">
-                    <option value="mayor">Mayor</option>
-                    <option value="menor">Menor</option>
-                    <option value="disminuida">Disminuida</option>
-                </optgroup>
-                <optgroup label="Tétradas (4 Notas)">
-                    <option value="maj7">Maj7 (Mayor 7)</option>
-                    <option value="min7">Min7 (Menor 7)</option>
-                    <option value="dom7">7 (Dominante)</option>
-                    <option value="m7b5">m7b5 (Semi-Dism)</option>
-                </optgroup>
-            </select>
+    <div id="contenedor-app">
+        <div class="controles" id="panel-controles-principal">
+            <div id="panel-selectores" style="margin-bottom: 15px;">
+                <select id="notaSelect">
+                    <option value="0">Do (C)</option><option value="1">Do# (C#)</option><option value="2">Re (D)</option>
+                    <option value="3">Re# (D#)</option><option value="4">Mi (E)</option><option value="5">Fa (F)</option>
+                    <option value="6">Fa# (F#)</option><option value="7">Sol (G)</option><option value="8">Sol# (G#)</option>
+                    <option value="9">La (A)</option><option value="10">La# (A#)</option><option value="11">Si (B)</option>
+                </select>
+                <select id="tipoSelect">
+                    <optgroup label="Tríadas (3 Notas)">
+                        <option value="mayor">Mayor</option>
+                        <option value="menor">Menor</option>
+                        <option value="disminuida">Disminuida</option>
+                    </optgroup>
+                    <optgroup label="Tétradas (4 Notas)">
+                        <option value="maj7">Maj7 (Mayor 7)</option>
+                        <option value="min7">Min7 (Menor 7)</option>
+                        <option value="dom7">7 (Dominante)</option>
+                        <option value="m7b5">m7b5 (Semi-Dism)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div id="panel-controles-dic">
+                <button class="btn-accion" onclick="calcularDiccionario()">Buscar Posiciones</button>
+            </div>
+
+            <div id="panel-controles-detector" style="display: none;">
+                <p style="margin: 0 0 10px 0; color: var(--text-muted); font-size: 14px;">
+                    👇 Haz clic directamente sobre las cuerdas y trastes del mástil para detectar cualquier acorde.
+                </p>
+                <button class="btn-clear" onclick="limpiarNotasDetector()">Limpiar Mástil</button>
+            </div>
+
+            <div id="panel-controles-prog" style="display: none;">
+                <button class="btn-accion" onclick="agregarAcorde()">+ Añadir a Progresión</button>
+                <button class="btn-pdf" onclick="exportarProgresionPDF()">📄 Exportar PDF</button>
+                <button class="btn-clear" onclick="limpiarProgresion()">Limpiar</button>
+                
+                <div class="progresion-lista" id="lista-acordes">
+                    <span style="color: var(--text-muted);">No hay acordes. Añade uno para empezar.</span>
+                </div>
+            </div>
         </div>
 
-        <div id="panel-controles-dic">
-            <button class="btn-accion" onclick="calcularDiccionario()">Buscar Posiciones</button>
-        </div>
+        <div class="contenedor-mastil" id="contenedor-mastil-wrapper">
+            <div class="mastil" id="mastil">
+                <div class="trastes" id="capa-trastes"></div>
+                
+                <div class="inlay" style="left: 133px;"></div><div class="inlay" style="left: 240px;"></div>
+                <div class="inlay" style="left: 346px;"></div><div class="inlay" style="left: 453px;"></div>
+                <div class="inlay" style="left: 613px; top: 30%;"></div><div class="inlay" style="left: 613px; top: 70%;"></div>
+                <div class="inlay" style="left: 773px;"></div>
 
-        <div id="panel-controles-detector" style="display: none;">
-            <p style="margin: 0 0 10px 0; color: var(--text-muted); font-size: 14px;">
-                👇 Haz clic directamente sobre las cuerdas y trastes del mástil para detectar cualquier acorde.
-            </p>
-            <button class="btn-clear" onclick="limpiarNotasDetector()">Limpiar Mástil</button>
-        </div>
+                <div class="cuerda" style="top: 15px;"><span class="letra-cuerda">e</span></div>
+                <div class="cuerda" style="top: 45px;"><span class="letra-cuerda">B</span></div>
+                <div class="cuerda" style="top: 75px;"><span class="letra-cuerda">G</span></div>
+                <div class="cuerda" style="top: 105px;"><span class="letra-cuerda">D</span></div>
+                <div class="cuerda" style="top: 135px;"><span class="letra-cuerda">A</span></div>
+                <div class="cuerda" style="top: 165px;"><span class="letra-cuerda">E</span></div>
 
-        <div id="panel-controles-prog" style="display: none;">
-            <button class="btn-accion" onclick="agregarAcorde()">+ Añadir a Progresión</button>
-            <button class="btn-pdf" onclick="exportarProgresionPDF()">📄 Exportar PDF</button>
-            <button class="btn-clear" onclick="limpiarProgresion()">Limpiar</button>
-            
-            <div class="progresion-lista" id="lista-acordes">
-                <span style="color: var(--text-muted);">No hay acordes. Añade uno para empezar.</span>
+                <div class="capa-interactiva" id="capa-interactiva"></div>
+            </div>
+        </div>
+        
+        <div id="leyenda-prog" class="leyenda">💡 Los puntos multicolor son notas en común para transiciones perfectas.</div>
+        <div id="panel-resultados-diccionario"></div>
+
+        <div id="panel-detector-info" style="display: none; max-width: 800px; margin: 0 auto;">
+            <div class="tarjeta-detector">
+                <div id="detector-titulo" class="nombre-acorde-detectado">Pinta notas en el mástil</div>
+                <div id="detector-detalles" class="detalles-acorde">Identificación inteligente de inversiones, bajos alterados y voicings de jazz.</div>
             </div>
         </div>
     </div>
 
-    <div class="contenedor-mastil">
-        <div class="mastil" id="mastil">
-            <div class="trastes" id="capa-trastes"></div>
-            
-            <!-- Inlays -->
-            <div class="inlay" style="left: 133px;"></div><div class="inlay" style="left: 240px;"></div>
-            <div class="inlay" style="left: 346px;"></div><div class="inlay" style="left: 453px;"></div>
-            <div class="inlay" style="left: 613px; top: 30%;"></div><div class="inlay" style="left: 613px; top: 70%;"></div>
-            <div class="inlay" style="left: 773px;"></div>
+    <!-- PANEL DE BIOGRAFÍA -->
+    <div id="panel-bio">
+        <div class="seccion-grupo" style="padding: 30px;">
+            <div class="bio-content">
+                <p>
+                    Con una profunda pasión por las seis cuerdas que comenzó a los 14 años, <strong>Carlos Silva</strong> se ha consolidado como un guitarrista versátil, experimentado músico de estudio y un dedicado educador musical. Su sólida formación técnica y teórica se forjó en la prestigiosa escuela de música moderna <em>21st Century Music</em> de Madrid, cimentando las bases de un sonido propio y una técnica impecable.
+                </p>
+                <p>
+                    A lo largo de su trayectoria profesional, Carlos ha dejado su huella sonora en destacados trabajos discográficos, colaborando con reconocidos productores y estudios del panorama nacional.
+                </p>
+                
+                <h3 style="margin-top: 30px; margin-bottom: 20px; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px;">Discografía Destacada</h3>
+                
+                <!-- Cuadrícula de Spotify -->
+                <div class="discografia-grid">
+                    <!-- Neno y los suyos -->
+                    <div class="disco-card">
+                        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/album/2fUHIqgzvywN5iACslpCnE?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                        <div class="disco-info">Grabado en los estudios R-5 de Pamplona con Kolibrí Díaz (Marea) y Txutxin.</div>
+                    </div>
+                    
+                    <!-- Berkana -->
+                    <div class="disco-card">
+                        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/album/6ylmdYiF1yiK0tX4K5oxK5?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                        <div class="disco-info">Grabado en los estudios R-5 de Pamplona con Kolibrí Díaz (Marea) y Txutxin.</div>
+                    </div>
 
-            <div class="cuerda" style="top: 15px;"><span class="letra-cuerda">e</span></div>
-            <div class="cuerda" style="top: 45px;"><span class="letra-cuerda">B</span></div>
-            <div class="cuerda" style="top: 75px;"><span class="letra-cuerda">G</span></div>
-            <div class="cuerda" style="top: 105px;"><span class="letra-cuerda">D</span></div>
-            <div class="cuerda" style="top: 135px;"><span class="letra-cuerda">A</span></div>
-            <div class="cuerda" style="top: 165px;"><span class="letra-cuerda">E</span></div>
+                    <!-- Medea -->
+                    <div class="disco-card">
+                        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/album/3Q5wuObAcTTQyPmaANd82J?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                        <div class="disco-info">Grabado en estudios El Jardín Paramétrico, bajo la producción de Jesús Yanes.</div>
+                    </div>
 
-            <div class="capa-interactiva" id="capa-interactiva"></div>
-        </div>
-    </div>
-    
-    <div id="leyenda-prog" class="leyenda">💡 Los puntos multicolor son notas en común para transiciones perfectas.</div>
+                    <!-- Re-Verso -->
+                    <div class="disco-card">
+                        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/album/59Sr5YE2SFav2gb1GgFBhG?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                        <div class="disco-info">Grabado en Martín Estudio, con Martin Calabria.</div>
+                    </div>
+                </div>
 
-    <div id="panel-resultados-diccionario"></div>
-
-    <div id="panel-detector-info" style="display: none; max-width: 800px; margin: 0 auto;">
-        <div class="tarjeta-detector">
-            <div id="detector-titulo" class="nombre-acorde-detectado">Pinta notas en el mástil</div>
-            <div id="detector-detalles" class="detalles-acorde">Identificación inteligente de inversiones, bajos alterados y voicings de jazz.</div>
+                <p style="margin-top: 35px;">
+                    Actualmente, Carlos compagina su actividad en los escenarios con su profunda vocación docente. Transmite su experiencia como profesor de guitarra en la escuela <strong>Planet Music</strong> de Madrid, además de impartir clases como profesional freelance, guiando a guitarristas de todos los niveles hacia su máxima expresión musical.
+                </p>
+            </div>
         </div>
     </div>
 
@@ -247,23 +360,17 @@
             'm7b5': [{ i: 0, n: 'R' }, { i: 3, n: 'b3' }, { i: 6, n: 'b5' }, { i: 10, n: 'b7' }]
         };
 
-        // --- DICCIONARIO MASIVO EXPANIDO PARA EL DETECTOR INVERSO ---
         const baseBibliotecaAcordes = [
-            // 2 Notas (Diadas)
             { nombre: "5 (Powerchord)", prefijo: "5", intervalos: [0, 7] },
             { nombre: "Mayor (sin 5ta)", prefijo: "(no5)", intervalos: [0, 4] },
             { nombre: "Menor (sin 5ta)", prefijo: "m(no5)", intervalos: [0, 3] },
             { nombre: "b5 (Tritono)", prefijo: "b5", intervalos: [0, 6] },
-
-            // Tríadas básicas completas
             { nombre: "Mayor", prefijo: "", intervalos: [0, 4, 7] },
             { nombre: "Menor", prefijo: "m", intervalos: [0, 3, 7] },
             { nombre: "Disminuida", prefijo: "dim", intervalos: [0, 3, 6] },
             { nombre: "Aumentada", prefijo: "aug", intervalos: [0, 4, 8] },
             { nombre: "Sus2", prefijo: "sus2", intervalos: [0, 2, 7] },
             { nombre: "Sus4", prefijo: "sus4", intervalos: [0, 5, 7] },
-
-            // Tétradas (7mas y 6tas completas)
             { nombre: "Maj7", prefijo: "Maj7", intervalos: [0, 4, 7, 11] },
             { nombre: "Menor 7", prefijo: "m7", intervalos: [0, 3, 7, 10] },
             { nombre: "7 Dominante", prefijo: "7", intervalos: [0, 4, 7, 10] },
@@ -277,22 +384,16 @@
             { nombre: "7b5", prefijo: "7b5", intervalos: [0, 4, 6, 10] },
             { nombre: "7sus4", prefijo: "7sus4", intervalos: [0, 5, 7, 10] },
             { nombre: "7sus2", prefijo: "7sus2", intervalos: [0, 2, 7, 10] },
-
-            // Tríadas Shell (Acordes de 4 notas omitiendo la 5ta - Muy común en guitarra)
             { nombre: "Maj7 (sin 5ta)", prefijo: "Maj7", intervalos: [0, 4, 11] },
             { nombre: "m7 (sin 5ta)", prefijo: "m7", intervalos: [0, 3, 10] },
             { nombre: "7 (sin 5ta)", prefijo: "7", intervalos: [0, 4, 10] },
             { nombre: "6 (sin 5ta)", prefijo: "6", intervalos: [0, 4, 9] },
             { nombre: "m6 (sin 5ta)", prefijo: "m6", intervalos: [0, 3, 9] },
             { nombre: "m(Maj7) (sin 5ta)", prefijo: "m(Maj7)", intervalos: [0, 3, 11] },
-
-            // Añadidas (add)
             { nombre: "add9", prefijo: "add9", intervalos: [0, 2, 4, 7] },
             { nombre: "add9 (sin 5ta)", prefijo: "add9", intervalos: [0, 2, 4] },
             { nombre: "m(add9)", prefijo: "m(add9)", intervalos: [0, 2, 3, 7] },
             { nombre: "m(add9) (sin 5ta)", prefijo: "m(add9)", intervalos: [0, 2, 3] },
-
-            // 9nas y 11nas completas y sin 5ta
             { nombre: "Maj9", prefijo: "Maj9", intervalos: [0, 2, 4, 7, 11] },
             { nombre: "Maj9 (sin 5ta)", prefijo: "Maj9", intervalos: [0, 2, 4, 11] },
             { nombre: "9", prefijo: "9", intervalos: [0, 2, 4, 7, 10] },
@@ -306,14 +407,10 @@
             { nombre: "11", prefijo: "11", intervalos: [0, 2, 4, 5, 7, 10] },
             { nombre: "m11", prefijo: "m11", intervalos: [0, 2, 3, 5, 7, 10] },
             { nombre: "m11 (sin 5ta)", prefijo: "m11", intervalos: [0, 2, 3, 5, 10] },
-
-            // 13ras y Voicings de Jazz (Shell de 3 o 4 notas)
             { nombre: "13", prefijo: "13", intervalos: [0, 2, 4, 5, 7, 9, 10] },
             { nombre: "13 (voicing común)", prefijo: "13", intervalos: [0, 4, 9, 10] },
             { nombre: "Maj13 (voicing común)", prefijo: "Maj13", intervalos: [0, 4, 9, 11] },
             { nombre: "m13 (voicing común)", prefijo: "m13", intervalos: [0, 3, 9, 10] },
-
-            // Alterados (Alt)
             { nombre: "7b9", prefijo: "7b9", intervalos: [0, 1, 4, 7, 10] },
             { nombre: "7b9 (sin 5ta)", prefijo: "7b9", intervalos: [0, 1, 4, 10] },
             { nombre: "7#9", prefijo: "7#9", intervalos: [0, 3, 4, 7, 10] },
@@ -363,24 +460,35 @@
 
         function cambiarModo(modo) {
             modoActual = modo;
+            
+            // Gestionar estado visual de los botones
             document.getElementById('tab-dic').classList.toggle('activo', modo === 'diccionario');
             document.getElementById('tab-detector').classList.toggle('activo', modo === 'detector');
             document.getElementById('tab-prog').classList.toggle('activo', modo === 'progresion');
+            document.getElementById('tab-bio').classList.toggle('activo', modo === 'bio');
             
-            document.getElementById('panel-selectores').style.display = (modo === 'diccionario' || modo === 'progresion') ? 'block' : 'none';
-            document.getElementById('panel-controles-dic').style.display = modo === 'diccionario' ? 'block' : 'none';
-            document.getElementById('panel-resultados-diccionario').style.display = modo === 'diccionario' ? 'block' : 'none';
-            
-            document.getElementById('panel-controles-detector').style.display = modo === 'detector' ? 'block' : 'none';
-            document.getElementById('panel-detector-info').style.display = modo === 'detector' ? 'block' : 'none';
-            
-            document.getElementById('panel-controles-prog').style.display = modo === 'progresion' ? 'block' : 'none';
-            document.getElementById('leyenda-prog').style.display = modo === 'progresion' ? 'block' : 'none';
-            
-            document.querySelectorAll('.nota').forEach(n => n.remove());
+            let esAppTool = (modo === 'diccionario' || modo === 'detector' || modo === 'progresion');
 
-            if(modo === 'progresion') renderizarMapaProgresion();
-            if(modo === 'detector') renderizarDetector();
+            // Mostrar u Ocultar el contenedor principal de la App vs la Biografía
+            document.getElementById('contenedor-app').style.display = esAppTool ? 'block' : 'none';
+            document.getElementById('panel-bio').style.display = modo === 'bio' ? 'block' : 'none';
+
+            if (esAppTool) {
+                document.getElementById('panel-selectores').style.display = (modo === 'diccionario' || modo === 'progresion') ? 'block' : 'none';
+                document.getElementById('panel-controles-dic').style.display = modo === 'diccionario' ? 'block' : 'none';
+                document.getElementById('panel-resultados-diccionario').style.display = modo === 'diccionario' ? 'block' : 'none';
+                
+                document.getElementById('panel-controles-detector').style.display = modo === 'detector' ? 'block' : 'none';
+                document.getElementById('panel-detector-info').style.display = modo === 'detector' ? 'block' : 'none';
+                
+                document.getElementById('panel-controles-prog').style.display = modo === 'progresion' ? 'block' : 'none';
+                document.getElementById('leyenda-prog').style.display = modo === 'progresion' ? 'block' : 'none';
+                
+                document.querySelectorAll('.nota').forEach(n => n.remove());
+
+                if(modo === 'progresion') renderizarMapaProgresion();
+                if(modo === 'detector') renderizarDetector();
+            }
         }
 
         function manejarClicMastil(cuerdaIdx, trasteNum) {
@@ -419,7 +527,7 @@
             let detalles = document.getElementById('detector-detalles');
 
             if (notas.length === 0) {
-                titulo.innerText = "Pinta notas en el mástil";
+                titulo.innerHTML = "Pinta notas en el mástil";
                 detalles.innerText = "Identificación inteligente de inversiones, bajos alterados y voicings de jazz.";
                 return;
             }
@@ -429,7 +537,6 @@
             let pitchClasses = [...new Set(notas.map(n => n.pc))];
             let coincidencias = [];
 
-            // Evaluamos las 12 notas posibles como raíz para detectar Slash Chords complejos
             const todasLasNotas = [0,1,2,3,4,5,6,7,8,9,10,11];
 
             todasLasNotas.forEach(raizCand => {
@@ -451,41 +558,51 @@
                             cifrado: `${nombreRaizEn}${acordeBase.prefijo}${cifradoBajo}`,
                             esInversion: esInversion,
                             bajo: bajoNota.nombre,
-                            complejidad: acordeBase.nombre.length // Usado para priorizar acordes de nombre más simple
+                            complejidad: acordeBase.nombre.length 
                         });
                     }
                 });
             });
 
-            // Ordenamiento inteligente: Primero los acordes en estado fundamental, luego por nombre más corto.
             coincidencias.sort((a, b) => {
                 if (a.esInversion !== b.esInversion) return a.esInversion ? 1 : -1;
                 return a.complejidad - b.complejidad;
             });
 
             if (coincidencias.length > 0) {
-                let principal = coincidencias[0];
-                let htmlTitulo = `${principal.cifrado}`;
-                if(principal.esInversion) {
-                    htmlTitulo += `<span class="badge-inversion">Bajo Alterado</span>`;
+                let unicas = [];
+                let vistos = new Set();
+                for(let c of coincidencias) {
+                    if(!vistos.has(c.cifrado)) {
+                        vistos.add(c.cifrado);
+                        unicas.push(c);
+                    }
                 }
+
+                let principal = unicas[0];
+                let htmlTitulo = `<div>${principal.cifrado} ${principal.esInversion ? '<span class="badge-inversion">Bajo Alterado</span>' : ''}</div>`;
+                
+                if(unicas.length > 1) {
+                    let secundaria = unicas[1];
+                    htmlTitulo += `<div class="opcion-secundaria"> ó ${secundaria.cifrado} ${secundaria.esInversion ? '<span class="badge-inversion" style="opacity: 0.7;">Bajo Alterado</span>' : ''}</div>`;
+                }
+
                 titulo.innerHTML = htmlTitulo;
                 
-                let textoDetalles = `<strong>Lectura:</strong> ${principal.nombreCompleto}<br>`;
-                textoDetalles += `<strong>Notas tocadas:</strong> ${notas.map(n => n.nombre).join(', ')}`;
+                let textoDetalles = `<strong>Opción 1:</strong> ${principal.nombreCompleto}<br>`;
+                if(unicas.length > 1) {
+                    textoDetalles += `<strong>Opción 2:</strong> ${unicas[1].nombreCompleto}<br>`;
+                }
+                textoDetalles += `<br><strong>Notas tocadas:</strong> ${notas.map(n => n.nombre).join(', ')}`;
                 
-                // Mostrar alternativas si las hay (ej. un Am7/C vs un C6)
-                if(coincidencias.length > 1) {
-                    let unicas = [...new Set(coincidencias.slice(1).map(c => c.cifrado))].filter(c => c !== principal.cifrado);
-                    if(unicas.length > 0) {
-                        textoDetalles += `<br><br><span style="color:#64748b; font-size: 13px;"><em>También interpretable como:</em> ${unicas.slice(0, 3).join(' | ')}</span>`;
-                    }
+                if(unicas.length > 2) {
+                    textoDetalles += `<br><br><span style="color:#64748b; font-size: 13px;"><em>Otras posibles interpretaciones:</em> ${unicas.slice(2, 5).map(c => c.cifrado).join(' | ')}</span>`;
                 }
 
                 detalles.innerHTML = textoDetalles;
             } else {
                 let nombresUnicos = [...new Set(notas.map(n => n.nombre))].join(', ');
-                titulo.innerText = "Acorde no registrado";
+                titulo.innerHTML = "Acorde no registrado";
                 detalles.innerHTML = `<strong>Notas seleccionadas:</strong> ${nombresUnicos}<br>Combinación demasiado inusual o ambigua.`;
             }
         }
