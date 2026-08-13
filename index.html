@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La fantástica APP del profesor Silva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #09090b; --panel-bg: rgba(255, 255, 255, 0.03); --panel-border: rgba(255, 255, 255, 0.08);
+            --accent: #00f2fe; --accent-hover: #4facfe; --text-main: #f8fafc; --text-muted: #94a3b8;
+            --fretboard: linear-gradient(to right, #18181b, #27272a);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; background-color: var(--bg-dark); 
+            background-image: radial-gradient(circle at 50% 0%, #1e1e24 0%, transparent 70%);
+            color: var(--text-main); text-align: center; margin: 0; padding: 20px 10px; min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-weight: 800; font-size: 2.2rem; margin-bottom: 25px;
+            background: linear-gradient(to right, #00f2fe, #4facfe);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px;
+        }
+        
+        .tabs { 
+            display: inline-flex; background: rgba(0,0,0,0.5); padding: 5px; 
+            border-radius: 12px; margin-bottom: 30px; border: 1px solid var(--panel-border);
+            flex-wrap: wrap; justify-content: center;
+        }
+        .tab-btn {
+            background: transparent; color: var(--text-muted); border: none; padding: 12px 20px;
+            font-size: 15px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tab-btn:hover { color: var(--text-main); }
+        .tab-btn.activo { 
+            background-color: var(--panel-bg); color: var(--accent); 
+            box-shadow: 0 4px 12px rgba(0, 242, 254, 0.1); border: 1px solid var(--panel-border);
+        }
+
+        .controles {
+            background: var(--panel-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--panel-border); padding: 20px; border-radius: 16px;
+            display: inline-block; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 800px; width: 100%; box-sizing: border-box;
+        }
+
+        select, button { 
+            padding: 12px 20px; margin: 8px; border-radius: 10px; font-size: 15px; 
+            border: none; font-weight: 600; font-family: 'Inter', sans-serif; transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        select { 
+            background-color: rgba(255,255,255,0.05); color: var(--text-main); 
+            border: 1px solid var(--panel-border); cursor: pointer; outline: none;
+        }
+        select:hover { background-color: rgba(255,255,255,0.1); }
+        select option { background-color: var(--bg-dark); }
+        
+        .btn-accion { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: #000; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3); }
+        .btn-accion:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5); }
+        .btn-clear { background: rgba(255, 63, 52, 0.1); color: #ff3f34; border: 1px solid rgba(255, 63, 52, 0.3); cursor: pointer; }
+        .btn-clear:hover { background: rgba(255, 63, 52, 0.2); transform: translateY(-2px); }
+        .btn-pdf { background: rgba(46, 213, 115, 0.1); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); cursor: pointer; }
+        .btn-pdf:hover { background: rgba(46, 213, 115, 0.2); transform: translateY(-2px); }
+
+        .contenedor-mastil {
+            width: 100%; overflow-x: auto; margin: 0 auto 30px auto;
+            padding-bottom: 15px; -webkit-overflow-scrolling: touch;
+        }
+
+        .mastil {
+            background: var(--fretboard); width: 800px; height: 180px; 
+            position: relative; border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 20px rgba(0,0,0,0.8);
+            margin: 0 auto; user-select: none;
+        }
+        .trastes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; pointer-events: none; }
+        .traste { flex: 1; border-right: 2px solid rgba(255,255,255,0.1); position: relative;}
+        .traste:first-child { border-left: 8px solid #cbd5e1; box-shadow: 2px 0 5px rgba(0,0,0,0.5);}
+        .num-traste { position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); color: var(--text-muted); font-size: 13px; font-weight:600;}
+
+        .inlay { position: absolute; width: 10px; height: 10px; background: rgba(255, 255, 255, 0.15); border-radius: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+        .cuerda { height: 2px; background: linear-gradient(to bottom, #f1f5f9, #94a3b8); width: 100%; position: absolute; left: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none; }
+        .letra-cuerda { position: absolute; right: -30px; top: -10px; color: var(--text-muted); font-weight: 600; font-size: 16px; }
+
+        .capa-interactiva { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
+        .zona-clic { position: absolute; cursor: pointer; border-radius: 4px; }
+        .zona-clic:hover { background: rgba(0, 242, 254, 0.15); }
+
+        .nota {
+            height: 26px; min-width: 26px; border-radius: 50%; position: absolute; transform: translate(-50%, -50%); 
+            color: white; font-size: 12px; font-weight: 800; line-height: 26px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+            z-index: 10; white-space: nowrap; padding: 0 6px; box-sizing: border-box; text-shadow: 0 1px 3px rgba(0,0,0,0.8); transition: all 0.2s ease;
+            pointer-events: none;
+        }
+        .nota-comun { border-radius: 8px; border: 2px solid rgba(255,255,255,0.8); z-index: 20; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+
+        #panel-resultados-diccionario { max-width: 800px; margin: 0 auto; text-align: left; }
+        .seccion-grupo { background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        h3 { color: var(--text-main); margin: 0 0 15px 0; font-size: 16px; font-weight: 600;}
+        .grupo-botones { display: flex; flex-wrap: wrap; gap: 10px; }
+        .btn-acorde { background: rgba(255,255,255,0.05); border: 1px solid var(--panel-border); font-size: 14px; color: var(--text-muted); border-radius: 8px;}
+        .btn-acorde:hover { background: rgba(255,255,255,0.1); color: var(--text-main); transform: translateY(-2px);}
+
+        .progresion-lista {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 20px;
+            padding: 20px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid var(--panel-border);
+        }
+        .etiqueta-acorde { padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .leyenda { margin-top: 20px; font-size: 14px; color: var(--text-muted); display: none; }
+
+        .tarjeta-detector {
+            background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 12px; padding: 20px; margin-top: 10px; text-align: center;
+        }
+        .nombre-acorde-detectado { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin-bottom: 8px; letter-spacing: -1px; }
+        .detalles-acorde { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+        .badge-inversion { display: inline-block; background: rgba(255, 63, 52, 0.2); color: #ff4757; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 10px; vertical-align: middle; }
+
+        #contenedor-exportacion-pdf { display: none; }
+
+        @media print {
+            body { background: #ffffff !important; color: #000000 !important; padding: 10px; margin: 0; }
+            h1, .tabs, .controles, .contenedor-mastil, .leyenda, #panel-resultados-diccionario, #panel-detector-info { display: none !important; }
+            #contenedor-exportacion-pdf { display: block !important; width: 100%; text-align: center; font-family: 'Inter', sans-serif; }
+            .pdf-titulo { color: #000000; font-size: 24px; font-weight: 800; border-bottom: 2px solid #222; padding-bottom: 8px; margin-bottom: 25px; text-align: left; }
+            .pdf-imagen-mastil { width: 100%; height: auto; border: 1px solid #444; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 25px; display: block; }
+            .pdf-leyenda-titulo { font-size: 16px; font-weight: 700; text-align: left; margin-bottom: 14px; color: #111; text-transform: uppercase; letter-spacing: 0.5px; }
+            .pdf-grid-colores { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+            .pdf-item-color { display: flex; align-items: center; gap: 14px; font-size: 16px; font-weight: 600; color: #222; }
+            .pdf-circulo-color { width: 20px; height: 20px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 1px solid rgba(0,0,0,0.15); }
+            .pdf-nombre-color { color: #666; font-size: 14px; font-weight: 400; font-style: italic; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>La fantástica APP del profesor Silva</h1>
+    
+    <div class="tabs">
+        <button id="tab-dic" class="tab-btn activo" onclick="cambiarModo('diccionario')">Buscador Posiciones</button>
+        <button id="tab-detector" class="tab-btn" onclick="cambiarModo('detector')">🎨 Detector Inverso</button>
+        <button id="tab-prog" class="tab-btn" onclick="cambiarModo('progresion')">Progresiones</button>
+    </div>
+    
+    <div class="controles">
+        <div id="panel-selectores" style="margin-bottom: 15px;">
+            <select id="notaSelect">
+                <option value="0">Do (C)</option><option value="1">Do# (C#)</option><option value="2">Re (D)</option>
+                <option value="3">Re# (D#)</option><option value="4">Mi (E)</option><option value="5">Fa (F)</option>
+                <option value="6">Fa# (F#)</option><option value="7">Sol (G)</option><option value="8">Sol# (G#)</option>
+                <option value="9">La (A)</option><option value="10">La# (A#)</option><option value="11">Si (B)</option>
+            </select>
+            <select id="tipoSelect">
+                <optgroup label="Tríadas (3 Notas)">
+                    <option value="mayor">Mayor</option>
+                    <option value="menor">Menor</option>
+                    <option value="disminuida">Disminuida</option>
+                </optgroup>
+                <optgroup label="Tétradas (4 Notas)">
+                    <option value="maj7">Maj7 (Mayor 7)</option>
+                    <option value="min7">Min7 (Menor 7)</option>
+                    <option value="dom7">7 (Dominante)</option>
+                    <option value="m7b5">m7b5 (Semi-Dism)</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div id="panel-controles-dic">
+            <button class="btn-accion" onclick="calcularDiccionario()">Buscar Posiciones</button>
+        </div>
+
+        <div id="panel-controles-detector" style="display: none;">
+            <p style="margin: 0 0 10px 0; color: var(--text-muted); font-size: 14px;">
+                👇 Haz clic directamente sobre las cuerdas y trastes del mástil para detectar cualquier acorde.
+            </p>
+            <button class="btn-clear" onclick="limpiarNotasDetector()">Limpiar Mástil</button>
+        </div>
+
+        <div id="panel-controles-prog" style="display: none;">
+            <button class="btn-accion" onclick="agregarAcorde()">+ Añadir a Progresión</button>
+            <button class="btn-pdf" onclick="exportarProgresionPDF()">📄 Exportar PDF</button>
+            <button class="btn-clear" onclick="limpiarProgresion()">Limpiar</button>
+            
+            <div class="progresion-lista" id="lista-acordes">
+                <span style="color: var(--text-muted);">No hay acordes. Añade uno para empezar.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="contenedor-mastil">
+        <div class="mastil" id="mastil">
+            <div class="trastes" id="capa-trastes"></div>
+            
+            <!-- Inlays -->
+            <div class="inlay" style="left: 133px;"></div><div class="inlay" style="left: 240px;"></div>
+            <div class="inlay" style="left: 346px;"></div><div class="inlay" style="left: 453px;"></div>
+            <div class="inlay" style="left: 613px; top: 30%;"></div><div class="inlay" style="left: 613px; top: 70%;"></div>
+            <div class="inlay" style="left: 773px;"></div>
+
+            <div class="cuerda" style="top: 15px;"><span class="letra-cuerda">e</span></div>
+            <div class="cuerda" style="top: 45px;"><span class="letra-cuerda">B</span></div>
+            <div class="cuerda" style="top: 75px;"><span class="letra-cuerda">G</span></div>
+            <div class="cuerda" style="top: 105px;"><span class="letra-cuerda">D</span></div>
+            <div class="cuerda" style="top: 135px;"><span class="letra-cuerda">A</span></div>
+            <div class="cuerda" style="top: 165px;"><span class="letra-cuerda">E</span></div>
+
+            <div class="capa-interactiva" id="capa-interactiva"></div>
+        </div>
+    </div>
+    
+    <div id="leyenda-prog" class="leyenda">💡 Los puntos multicolor son notas en común para transiciones perfectas.</div>
+
+    <div id="panel-resultados-diccionario"></div>
+
+    <div id="panel-detector-info" style="display: none; max-width: 800px; margin: 0 auto;">
+        <div class="tarjeta-detector">
+            <div id="detector-titulo" class="nombre-acorde-detectado">Pinta notas en el mástil</div>
+            <div id="detector-detalles" class="detalles-acorde">Identificación inteligente de inversiones, bajos alterados y voicings de jazz.</div>
+        </div>
+    </div>
+
+    <div id="contenedor-exportacion-pdf"></div>
+
+    <script>
+        let modoActual = 'diccionario';
+        const midi_tuning = [64, 59, 55, 50, 45, 40]; 
+        const nombresNotas = ["Do", "Do#", "Re", "Re#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si"];
+        const nombresNotasEn = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        
+        const nombresTipos = { 
+            'mayor': 'Mayor', 'menor': 'Menor', 'disminuida': 'Dism.',
+            'maj7': 'Maj7', 'min7': 'Min7', 'dom7': '7', 'm7b5': 'm7b5'
+        };
+        
+        const formulas = {
+            'mayor': [{ i: 0, n: 'R' }, { i: 4, n: '3' }, { i: 7, n: '5' }],
+            'menor': [{ i: 0, n: 'R' }, { i: 3, n: 'b3' }, { i: 7, n: '5' }],
+            'disminuida': [{ i: 0, n: 'R' }, { i: 3, n: 'b3' }, { i: 6, n: 'b5' }],
+            'maj7': [{ i: 0, n: 'R' }, { i: 4, n: '3' }, { i: 7, n: '5' }, { i: 11, n: '7' }],
+            'min7': [{ i: 0, n: 'R' }, { i: 3, n: 'b3' }, { i: 7, n: '5' }, { i: 10, n: 'b7' }],
+            'dom7': [{ i: 0, n: 'R' }, { i: 4, n: '3' }, { i: 7, n: '5' }, { i: 10, n: 'b7' }],
+            'm7b5': [{ i: 0, n: 'R' }, { i: 3, n: 'b3' }, { i: 6, n: 'b5' }, { i: 10, n: 'b7' }]
+        };
+
+        // --- DICCIONARIO MASIVO EXPANIDO PARA EL DETECTOR INVERSO ---
+        const baseBibliotecaAcordes = [
+            // 2 Notas (Diadas)
+            { nombre: "5 (Powerchord)", prefijo: "5", intervalos: [0, 7] },
+            { nombre: "Mayor (sin 5ta)", prefijo: "(no5)", intervalos: [0, 4] },
+            { nombre: "Menor (sin 5ta)", prefijo: "m(no5)", intervalos: [0, 3] },
+            { nombre: "b5 (Tritono)", prefijo: "b5", intervalos: [0, 6] },
+
+            // Tríadas básicas completas
+            { nombre: "Mayor", prefijo: "", intervalos: [0, 4, 7] },
+            { nombre: "Menor", prefijo: "m", intervalos: [0, 3, 7] },
+            { nombre: "Disminuida", prefijo: "dim", intervalos: [0, 3, 6] },
+            { nombre: "Aumentada", prefijo: "aug", intervalos: [0, 4, 8] },
+            { nombre: "Sus2", prefijo: "sus2", intervalos: [0, 2, 7] },
+            { nombre: "Sus4", prefijo: "sus4", intervalos: [0, 5, 7] },
+
+            // Tétradas (7mas y 6tas completas)
+            { nombre: "Maj7", prefijo: "Maj7", intervalos: [0, 4, 7, 11] },
+            { nombre: "Menor 7", prefijo: "m7", intervalos: [0, 3, 7, 10] },
+            { nombre: "7 Dominante", prefijo: "7", intervalos: [0, 4, 7, 10] },
+            { nombre: "m7b5 (Semidisminuida)", prefijo: "m7b5", intervalos: [0, 3, 6, 10] },
+            { nombre: "dim7 (Disminuida 7)", prefijo: "dim7", intervalos: [0, 3, 6, 9] },
+            { nombre: "m(Maj7)", prefijo: "m(Maj7)", intervalos: [0, 3, 7, 11] },
+            { nombre: "6", prefijo: "6", intervalos: [0, 4, 7, 9] },
+            { nombre: "m6", prefijo: "m6", intervalos: [0, 3, 7, 9] },
+            { nombre: "Maj7#5", prefijo: "Maj7#5", intervalos: [0, 4, 8, 11] },
+            { nombre: "7#5", prefijo: "7#5", intervalos: [0, 4, 8, 10] },
+            { nombre: "7b5", prefijo: "7b5", intervalos: [0, 4, 6, 10] },
+            { nombre: "7sus4", prefijo: "7sus4", intervalos: [0, 5, 7, 10] },
+            { nombre: "7sus2", prefijo: "7sus2", intervalos: [0, 2, 7, 10] },
+
+            // Tríadas Shell (Acordes de 4 notas omitiendo la 5ta - Muy común en guitarra)
+            { nombre: "Maj7 (sin 5ta)", prefijo: "Maj7", intervalos: [0, 4, 11] },
+            { nombre: "m7 (sin 5ta)", prefijo: "m7", intervalos: [0, 3, 10] },
+            { nombre: "7 (sin 5ta)", prefijo: "7", intervalos: [0, 4, 10] },
+            { nombre: "6 (sin 5ta)", prefijo: "6", intervalos: [0, 4, 9] },
+            { nombre: "m6 (sin 5ta)", prefijo: "m6", intervalos: [0, 3, 9] },
+            { nombre: "m(Maj7) (sin 5ta)", prefijo: "m(Maj7)", intervalos: [0, 3, 11] },
+
+            // Añadidas (add)
+            { nombre: "add9", prefijo: "add9", intervalos: [0, 2, 4, 7] },
+            { nombre: "add9 (sin 5ta)", prefijo: "add9", intervalos: [0, 2, 4] },
+            { nombre: "m(add9)", prefijo: "m(add9)", intervalos: [0, 2, 3, 7] },
+            { nombre: "m(add9) (sin 5ta)", prefijo: "m(add9)", intervalos: [0, 2, 3] },
+
+            // 9nas y 11nas completas y sin 5ta
+            { nombre: "Maj9", prefijo: "Maj9", intervalos: [0, 2, 4, 7, 11] },
+            { nombre: "Maj9 (sin 5ta)", prefijo: "Maj9", intervalos: [0, 2, 4, 11] },
+            { nombre: "9", prefijo: "9", intervalos: [0, 2, 4, 7, 10] },
+            { nombre: "9 (sin 5ta)", prefijo: "9", intervalos: [0, 2, 4, 10] },
+            { nombre: "m9", prefijo: "m9", intervalos: [0, 2, 3, 7, 10] },
+            { nombre: "m9 (sin 5ta)", prefijo: "m9", intervalos: [0, 2, 3, 10] },
+            { nombre: "9sus4", prefijo: "9sus4", intervalos: [0, 2, 5, 7, 10] },
+            { nombre: "6/9", prefijo: "6/9", intervalos: [0, 2, 4, 7, 9] },
+            { nombre: "6/9 (sin 5ta)", prefijo: "6/9", intervalos: [0, 2, 4, 9] },
+            { nombre: "m6/9", prefijo: "m6/9", intervalos: [0, 2, 3, 7, 9] },
+            { nombre: "11", prefijo: "11", intervalos: [0, 2, 4, 5, 7, 10] },
+            { nombre: "m11", prefijo: "m11", intervalos: [0, 2, 3, 5, 7, 10] },
+            { nombre: "m11 (sin 5ta)", prefijo: "m11", intervalos: [0, 2, 3, 5, 10] },
+
+            // 13ras y Voicings de Jazz (Shell de 3 o 4 notas)
+            { nombre: "13", prefijo: "13", intervalos: [0, 2, 4, 5, 7, 9, 10] },
+            { nombre: "13 (voicing común)", prefijo: "13", intervalos: [0, 4, 9, 10] },
+            { nombre: "Maj13 (voicing común)", prefijo: "Maj13", intervalos: [0, 4, 9, 11] },
+            { nombre: "m13 (voicing común)", prefijo: "m13", intervalos: [0, 3, 9, 10] },
+
+            // Alterados (Alt)
+            { nombre: "7b9", prefijo: "7b9", intervalos: [0, 1, 4, 7, 10] },
+            { nombre: "7b9 (sin 5ta)", prefijo: "7b9", intervalos: [0, 1, 4, 10] },
+            { nombre: "7#9", prefijo: "7#9", intervalos: [0, 3, 4, 7, 10] },
+            { nombre: "7#9 (sin 5ta)", prefijo: "7#9", intervalos: [0, 3, 4, 10] },
+            { nombre: "m7b9", prefijo: "m7b9", intervalos: [0, 1, 3, 7, 10] },
+            { nombre: "7b5b9", prefijo: "7alt", intervalos: [0, 1, 4, 6, 10] },
+            { nombre: "7b5#9", prefijo: "7alt", intervalos: [0, 3, 4, 6, 10] },
+            { nombre: "7#5b9", prefijo: "7alt", intervalos: [0, 1, 4, 8, 10] },
+            { nombre: "7#5#9", prefijo: "7alt", intervalos: [0, 3, 4, 8, 10] },
+            { nombre: "13b9", prefijo: "13b9", intervalos: [0, 1, 4, 9, 10] }
+        ];
+
+        const grupos3Cerradas = [[1,2,3], [2,3,4], [3,4,5], [4,5,6]];
+        const grupos3Abiertas = [[1,2,4], [2,3,5], [3,4,6], [1,3,5], [2,4,6]];
+        const grupos4Cerradas = [[1,2,3,4], [2,3,4,5], [3,4,5,6]];
+        const grupos4Abiertas = [[1,2,3,5], [2,3,4,6], [1,2,4,5], [1,3,4,6]];
+
+        const traductorColores = {
+            '#ff4757': 'Rojo', '#1e90ff': 'Azul', '#2ed573': 'Verde',
+            '#ffa502': 'Naranja', '#9c88ff': 'Morado', '#ff007f': 'Rosa'
+        };
+
+        let notasPintadasDetector = [null, null, null, null, null, null];
+
+        const capaTrastes = document.getElementById('capa-trastes');
+        for(let i=1; i<=15; i++){
+            let t = document.createElement('div'); t.className = 'traste';
+            if ([3, 5, 7, 9, 12, 15].includes(i)) t.innerHTML = `<span class="num-traste">${i}</span>`;
+            capaTrastes.appendChild(t);
+        }
+        const alturaCuerdas = [15, 45, 75, 105, 135, 165]; 
+        const anchoTraste = 800 / 15;
+
+        const capaInteractiva = document.getElementById('capa-interactiva');
+        for (let c = 0; c < 6; c++) {
+            for (let t = 0; t <= 15; t++) {
+                let z = document.createElement('div');
+                z.className = 'zona-clic';
+                z.style.top = (alturaCuerdas[c] - 12) + 'px';
+                z.style.height = '24px';
+                z.style.left = (t === 0 ? 0 : (t - 1) * anchoTraste + 4) + 'px';
+                z.style.width = (t === 0 ? 15 : anchoTraste - 2) + 'px';
+                z.onclick = () => manejarClicMastil(c, t);
+                capaInteractiva.appendChild(z);
+            }
+        }
+
+        function cambiarModo(modo) {
+            modoActual = modo;
+            document.getElementById('tab-dic').classList.toggle('activo', modo === 'diccionario');
+            document.getElementById('tab-detector').classList.toggle('activo', modo === 'detector');
+            document.getElementById('tab-prog').classList.toggle('activo', modo === 'progresion');
+            
+            document.getElementById('panel-selectores').style.display = (modo === 'diccionario' || modo === 'progresion') ? 'block' : 'none';
+            document.getElementById('panel-controles-dic').style.display = modo === 'diccionario' ? 'block' : 'none';
+            document.getElementById('panel-resultados-diccionario').style.display = modo === 'diccionario' ? 'block' : 'none';
+            
+            document.getElementById('panel-controles-detector').style.display = modo === 'detector' ? 'block' : 'none';
+            document.getElementById('panel-detector-info').style.display = modo === 'detector' ? 'block' : 'none';
+            
+            document.getElementById('panel-controles-prog').style.display = modo === 'progresion' ? 'block' : 'none';
+            document.getElementById('leyenda-prog').style.display = modo === 'progresion' ? 'block' : 'none';
+            
+            document.querySelectorAll('.nota').forEach(n => n.remove());
+
+            if(modo === 'progresion') renderizarMapaProgresion();
+            if(modo === 'detector') renderizarDetector();
+        }
+
+        function manejarClicMastil(cuerdaIdx, trasteNum) {
+            if (modoActual !== 'detector') return;
+            if (notasPintadasDetector[cuerdaIdx] === trasteNum) {
+                notasPintadasDetector[cuerdaIdx] = null;
+            } else {
+                notasPintadasDetector[cuerdaIdx] = trasteNum;
+            }
+            renderizarDetector();
+        }
+
+        function limpiarNotasDetector() {
+            notasPintadasDetector = [null, null, null, null, null, null];
+            renderizarDetector();
+        }
+
+        function renderizarDetector() {
+            document.querySelectorAll('.nota').forEach(n => n.remove());
+            let notasActivas = [];
+            for (let c = 0; c < 6; c++) {
+                let traste = notasPintadasDetector[c];
+                if (traste !== null) {
+                    let pitchMidi = midi_tuning[c] + traste;
+                    let pc = pitchMidi % 12;
+                    let nombreNota = nombresNotas[pc];
+                    colocarPunto(c, traste, nombreNota, '#00f2fe', false);
+                    notasActivas.push({ cuerda: c, traste: traste, midi: pitchMidi, pc: pc, nombre: nombreNota });
+                }
+            }
+            analizarAcordeDetector(notasActivas);
+        }
+
+        function analizarAcordeDetector(notas) {
+            let titulo = document.getElementById('detector-titulo');
+            let detalles = document.getElementById('detector-detalles');
+
+            if (notas.length === 0) {
+                titulo.innerText = "Pinta notas en el mástil";
+                detalles.innerText = "Identificación inteligente de inversiones, bajos alterados y voicings de jazz.";
+                return;
+            }
+
+            notas.sort((a, b) => a.midi - b.midi);
+            let bajoNota = notas[0];
+            let pitchClasses = [...new Set(notas.map(n => n.pc))];
+            let coincidencias = [];
+
+            // Evaluamos las 12 notas posibles como raíz para detectar Slash Chords complejos
+            const todasLasNotas = [0,1,2,3,4,5,6,7,8,9,10,11];
+
+            todasLasNotas.forEach(raizCand => {
+                let relIntervals = pitchClasses.map(pc => (pc - raizCand + 12) % 12).sort((a,b) => a - b);
+
+                baseBibliotecaAcordes.forEach(acordeBase => {
+                    if (relIntervals.length === acordeBase.intervalos.length &&
+                        relIntervals.every((val, index) => val === acordeBase.intervalos[index])) {
+                        
+                        let nombreRaiz = nombresNotas[raizCand];
+                        let nombreRaizEn = nombresNotasEn[raizCand];
+                        let esInversion = bajoNota.pc !== raizCand;
+                        
+                        let sufijoBajo = esInversion ? ` / ${bajoNota.nombre}` : '';
+                        let cifradoBajo = esInversion ? `/${nombresNotasEn[bajoNota.pc]}` : '';
+
+                        coincidencias.push({
+                            nombreCompleto: `${nombreRaiz} ${acordeBase.nombre}${sufijoBajo}`,
+                            cifrado: `${nombreRaizEn}${acordeBase.prefijo}${cifradoBajo}`,
+                            esInversion: esInversion,
+                            bajo: bajoNota.nombre,
+                            complejidad: acordeBase.nombre.length // Usado para priorizar acordes de nombre más simple
+                        });
+                    }
+                });
+            });
+
+            // Ordenamiento inteligente: Primero los acordes en estado fundamental, luego por nombre más corto.
+            coincidencias.sort((a, b) => {
+                if (a.esInversion !== b.esInversion) return a.esInversion ? 1 : -1;
+                return a.complejidad - b.complejidad;
+            });
+
+            if (coincidencias.length > 0) {
+                let principal = coincidencias[0];
+                let htmlTitulo = `${principal.cifrado}`;
+                if(principal.esInversion) {
+                    htmlTitulo += `<span class="badge-inversion">Bajo Alterado</span>`;
+                }
+                titulo.innerHTML = htmlTitulo;
+                
+                let textoDetalles = `<strong>Lectura:</strong> ${principal.nombreCompleto}<br>`;
+                textoDetalles += `<strong>Notas tocadas:</strong> ${notas.map(n => n.nombre).join(', ')}`;
+                
+                // Mostrar alternativas si las hay (ej. un Am7/C vs un C6)
+                if(coincidencias.length > 1) {
+                    let unicas = [...new Set(coincidencias.slice(1).map(c => c.cifrado))].filter(c => c !== principal.cifrado);
+                    if(unicas.length > 0) {
+                        textoDetalles += `<br><br><span style="color:#64748b; font-size: 13px;"><em>También interpretable como:</em> ${unicas.slice(0, 3).join(' | ')}</span>`;
+                    }
+                }
+
+                detalles.innerHTML = textoDetalles;
+            } else {
+                let nombresUnicos = [...new Set(notas.map(n => n.nombre))].join(', ');
+                titulo.innerText = "Acorde no registrado";
+                detalles.innerHTML = `<strong>Notas seleccionadas:</strong> ${nombresUnicos}<br>Combinación demasiado inusual o ambigua.`;
+            }
+        }
+
+        function calcularDiccionario() {
+            let raiz = parseInt(document.getElementById('notaSelect').value);
+            let tipo = document.getElementById('tipoSelect').value;
+            let panel = document.getElementById('panel-resultados-diccionario');
+            panel.innerHTML = ''; 
+            
+            let target_pcs = formulas[tipo].map(f => ({ pc: (raiz + f.i) % 12, label: f.n }));
+            let esTetrad = target_pcs.length === 4;
+
+            let cerradas = esTetrad ? grupos4Cerradas : grupos3Cerradas;
+            let abiertas = esTetrad ? grupos4Abiertas : grupos3Abiertas;
+
+            cerradas.forEach(g => {
+                let acordes = buscarAcordesRecursivo(target_pcs, g);
+                if(acordes.length>0) crearSeccionBotones(`Posiciones Cerradas (Cuerdas ${g.join('-')})`, acordes, panel);
+            });
+            abiertas.forEach(g => {
+                let acordes = buscarAcordesRecursivo(target_pcs, g);
+                if(acordes.length>0) crearSeccionBotones(`Posiciones Abiertas / Drop (Cuerdas ${g.join('-')})`, acordes, panel);
+            });
+        }
+
+        function buscarAcordesRecursivo(targets, groupCuerdas) {
+            let trastesPorCuerda = groupCuerdas.map(c => getTrastesValidos(c - 1, targets));
+            let resultados = [];
+
+            function combinar(index, currentCombo) {
+                if (index === groupCuerdas.length) {
+                    let clases = new Set(currentCombo.map(n => n.pc));
+                    if (clases.size === targets.length) { 
+                        let trastesActivos = currentCombo.map(n => n.traste).filter(t => t > 0);
+                        let stretch = trastesActivos.length > 0 ? Math.max(...trastesActivos) - Math.min(...trastesActivos) : 0;
+                        let maxTraste = Math.max(...currentCombo.map(n => n.traste));
+                        
+                        if (stretch <= 4 && maxTraste <= 15) {
+                            resultados.push([...currentCombo]);
+                        }
+                    }
+                    return;
+                }
+
+                trastesPorCuerda[index].forEach(tObj => {
+                    let pitch = midi_tuning[groupCuerdas[index] - 1] + tObj.f;
+                    currentCombo.push({ cuerda: groupCuerdas[index], traste: tObj.f, label: tObj.l, pc: pitch % 12 });
+                    combinar(index + 1, currentCombo);
+                    currentCombo.pop(); 
+                });
+            }
+
+            combinar(0, []); 
+            
+            let unicos = []; let vistos = new Set();
+            resultados.forEach(r => {
+                let id = r.map(n => `${n.cuerda}-${n.traste}`).sort().join('|');
+                if(!vistos.has(id)){ vistos.add(id); unicos.push(r); }
+            });
+            return unicos.sort((a,b) => Math.min(...a.map(n=>n.traste).filter(t=>t>0)) - Math.min(...b.map(n=>n.traste).filter(t=>t>0)));
+        }
+
+        function getTrastesValidos(cuerdaIdx, targets) {
+            let val = [];
+            for(let f=0; f<=15; f++) {
+                let t = targets.find(x => x.pc === (midi_tuning[cuerdaIdx] + f) % 12);
+                if(t) val.push({ f: f, l: t.label });
+            }
+            return val;
+        }
+
+        function crearSeccionBotones(titulo, acordes, panel) {
+            let divSec = document.createElement('div'); divSec.className = 'seccion-grupo';
+            divSec.innerHTML = `<h3>${titulo}</h3>`;
+            let divBot = document.createElement('div'); divBot.className = 'grupo-botones';
+
+            acordes.forEach((ac) => {
+                let btn = document.createElement('button'); btn.className = 'btn-acorde';
+                btn.innerText = `Posición traste ${Math.min(...ac.map(n => n.traste).filter(f => f > 0)) || 0}`;
+                btn.onclick = () => {
+                    document.querySelectorAll('.nota').forEach(n => n.remove());
+                    ac.forEach(nota => colocarPunto(nota.cuerda - 1, nota.traste, nota.label, '#00f2fe', false));
+                };
+                divBot.appendChild(btn);
+            });
+            divSec.appendChild(divBot); panel.appendChild(divSec);
+        }
+
+        let progresion = [];
+        const paletaNeones = ['#ff4757', '#1e90ff', '#2ed573', '#ffa502', '#9c88ff', '#ff007f'];
+
+        function agregarAcorde() {
+            if (progresion.length >= 6) { alert("Límite visual de 6 acordes alcanzado."); return; }
+            let rVal = parseInt(document.getElementById('notaSelect').value);
+            let tVal = document.getElementById('tipoSelect').value;
+            let col = paletaNeones[progresion.length];
+            
+            progresion.push({
+                nombre: `${nombresNotas[rVal]} ${nombresTipos[tVal]}`,
+                notas: formulas[tVal].map(f => ({ pc: (rVal + f.i) % 12, label: f.n })),
+                color: col
+            });
+            actualizarUIProg(); renderizarMapaProgresion();
+        }
+
+        function limpiarProgresion() { progresion = []; actualizarUIProg(); renderizarMapaProgresion(); }
+
+        function actualizarUIProg() {
+            let cont = document.getElementById('lista-acordes');
+            if (progresion.length === 0) { cont.innerHTML = '<span style="color: var(--text-muted);">No hay acordes. Añade uno para empezar.</span>'; return; }
+            cont.innerHTML = '';
+            progresion.forEach(ac => {
+                let b = document.createElement('div'); b.className = 'etiqueta-acorde';
+                b.style.backgroundColor = ac.color; b.innerText = ac.nombre; cont.appendChild(b);
+            });
+        }
+
+        function renderizarMapaProgresion() {
+            document.querySelectorAll('.nota').forEach(n => n.remove());
+            if (progresion.length === 0) return;
+
+            for (let c = 0; c < 6; c++) {
+                for (let t = 0; t <= 15; t++) {
+                    let pc = (midi_tuning[c] + t) % 12;
+                    let coinc = progresion.map(ac => {
+                        let n = ac.notas.find(x => x.pc === pc);
+                        return n ? { label: n.label, color: ac.color } : null;
+                    }).filter(x => x !== null);
+                    if (coinc.length > 0) colocarPuntoMultiple(c, t, coinc);
+                }
+            }
+        }
+
+        function colocarPunto(cIdx, traste, texto, color, esComun) {
+            let p = document.createElement('div');
+            p.className = 'nota' + (esComun ? ' nota-comun' : '');
+            p.style.top = alturaCuerdas[cIdx] + 'px';
+            p.style.left = (traste === 0 ? 5 : (traste * anchoTraste) - (anchoTraste / 2)) + 'px';
+            p.style.backgroundColor = color; p.innerText = texto;
+            if(!esComun) p.style.boxShadow = `0 0 12px ${color}`;
+            document.getElementById('mastil').appendChild(p);
+            return p;
+        }
+
+        function colocarPuntoMultiple(cIdx, traste, coinc) {
+            if (coinc.length === 1) {
+                colocarPunto(cIdx, traste, coinc[0].label, coinc[0].color, false);
+            } else {
+                let p = colocarPunto(cIdx, traste, coinc.map(c => c.label).join('/'), 'transparent', true);
+                let pct = 100 / coinc.length;
+                let grad = coinc.map((c, i) => `${c.color} ${i * pct}%, ${c.color} ${(i + 1) * pct}%`).join(', ');
+                p.style.background = `linear-gradient(135deg, ${grad})`;
+            }
+        }
+
+        function exportarProgresionPDF() {
+            if (progresion.length === 0) {
+                alert("Por favor, añade acordes a la progresión antes de exportar.");
+                return;
+            }
+
+            let canvas = document.createElement('canvas');
+            canvas.width = 800; canvas.height = 210;
+            let ctx = canvas.getContext('2d');
+
+            let gradM = ctx.createLinearGradient(0, 0, 800, 0);
+            gradM.addColorStop(0, '#18181b'); gradM.addColorStop(1, '#27272a');
+            ctx.fillStyle = gradM; ctx.fillRect(0, 0, 800, 180);
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 2;
+            for(let i = 1; i <= 15; i++) {
+                let x = i * anchoTraste;
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 180); ctx.stroke();
+                if ([3, 5, 7, 9, 12, 15].includes(i)) {
+                    ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 13px Inter, sans-serif';
+                    ctx.textAlign = 'center'; ctx.fillText(i, x - (anchoTraste/2), 202);
+                }
+            }
+            
+            ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 8;
+            ctx.beginPath(); ctx.moveTo(4, 0); ctx.lineTo(4, 180); ctx.stroke();
+
+            ctx.lineWidth = 2;
+            alturaCuerdas.forEach((y) => {
+                let gradC = ctx.createLinearGradient(0, y, 0, y+2);
+                gradC.addColorStop(0, '#f1f5f9'); gradC.addColorStop(1, '#94a3b8');
+                ctx.strokeStyle = gradC; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(800, y); ctx.stroke();
+            });
+
+            for (let c = 0; c < 6; c++) {
+                for (let t = 0; t <= 15; t++) {
+                    let pc = (midi_tuning[c] + t) % 12;
+                    let coinc = progresion.map(ac => {
+                        let n = ac.notas.find(x => x.pc === pc);
+                        return n ? { label: n.label, color: ac.color } : null;
+                    }).filter(x => x !== null);
+
+                    if (coinc.length > 0) {
+                        let ptX = (t === 0 ? 5 : (t * anchoTraste) - (anchoTraste / 2));
+                        let ptY = alturaCuerdas[c];
+
+                        ctx.save();
+                        if (coinc.length === 1) {
+                            ctx.beginPath(); ctx.arc(ptX, ptY, 13, 0, 2 * Math.PI);
+                            ctx.fillStyle = coinc[0].color; ctx.fill();
+                            
+                            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px Inter, sans-serif';
+                            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                            ctx.fillText(coinc[0].label, ptX, ptY);
+                        } else {
+                            let numPartes = coinc.length;
+                            let anguloPaso = (2 * Math.PI) / numPartes;
+                            
+                            for (let i = 0; i < numPartes; i++) {
+                                ctx.beginPath(); ctx.moveTo(ptX, ptY);
+                                ctx.arc(ptX, ptY, 13, i * anguloPaso, (i + 1) * anguloPaso);
+                                ctx.closePath(); ctx.fillStyle = coinc[i].color; ctx.fill();
+                            }
+                            ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2;
+                            ctx.beginPath(); ctx.arc(ptX, ptY, 13, 0, 2 * Math.PI); ctx.stroke();
+
+                            let textoCombinado = coinc.map(cx => cx.label).join('/');
+                            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 9px Inter, sans-serif';
+                            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                            ctx.fillText(textoCombinado, ptX, ptY);
+                        }
+                        ctx.restore();
+                    }
+                }
+            }
+
+            let imgDataUrl = canvas.toDataURL('image/png');
+            let contenedorPrint = document.getElementById('contenedor-exportacion-pdf');
+            
+            let htmlLeyendaGrid = '';
+            progresion.forEach(ac => {
+                let nombreDeColorCastellano = traductorColores[ac.color.toLowerCase()] || 'Desconocido';
+                htmlLeyendaGrid += `
+                    <div class="pdf-item-color">
+                        <div class="pdf-circulo-color" style="background-color: ${ac.color};"></div>
+                        <div>
+                            <strong>${ac.nombre}</strong> 
+                            <span class="pdf-nombre-color">— Color: ${nombreDeColorCastellano}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            contenedorPrint.innerHTML = `
+                <div class="pdf-titulo">Mapa de Progresión de Acordes</div>
+                <img src="${imgDataUrl}" class="pdf-imagen-mastil" id="img-mastil-pdf" alt="Mástil">
+                <div class="pdf-leyenda-titulo">Leyenda de Colores Asociados</div>
+                <div class="pdf-grid-colores">${htmlLeyendaGrid}</div>
+            `;
+
+            setTimeout(() => {
+                window.print();
+            }, 350); 
+        }
+    </script>
+</body>
+</html>
